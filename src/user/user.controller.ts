@@ -12,22 +12,27 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { JwtGuard } from 'src/auth/guard';
 import { UserDto } from './dto';
+import { UserEntity } from './entity';
 import { UserService } from './user.service';
 
+@UseGuards(JwtGuard)
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get(':id')
-  get(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.findById(id);
+  async get(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.userService.findById(id);
+
+    return new UserEntity(user);
   }
   @Get()
-  getList(@Body() where: UserDto) {
-    return this.userService.findWhere(where);
+  async getList(@Body() where: UserDto) {
+    const list = await this.userService.findWhere(where);
+
+    return list.map((user) => new UserEntity(user));
   }
 
-  @UseGuards(JwtGuard)
   @Post()
   create(@Body() dto: UserDto) {
     return this.userService.create(dto);
