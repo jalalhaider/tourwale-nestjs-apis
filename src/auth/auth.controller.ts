@@ -12,7 +12,10 @@ export class AuthController {
   }
 
   @Post('sign-in')
-  async signIn(@Body() dto: any) {
-    return "I'm in sign in ";
+  async signIn(
+    @Body('email') email: string,
+    @Body('password') password: string,
+  ) {
+    return this.authService.signIn(email, password);
   }
 }
